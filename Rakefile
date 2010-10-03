@@ -30,3 +30,7 @@ specification = Gem::Specification.new do |s|
         FileList["ext/**/extconf.rb", "ext/**/*.h", "ext/**/*.c"].to_a 
 end
 
+Rake::GemPackageTask.new(specification) do |package|
+  package.need_zip = false
+  package.need_tar = false
+end
