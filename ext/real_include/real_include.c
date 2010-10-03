@@ -1,6 +1,9 @@
 #include "compat.h"
 #include "ruby.h"
 
+#define FALSE 0
+#define TRUE 1
+
 static VALUE
 class_alloc(VALUE flags, VALUE klass)
 {
@@ -18,18 +21,18 @@ class_alloc(VALUE flags, VALUE klass)
 static VALUE
 include_class_new(VALUE module, VALUE super)
 {
-  if (module == rb_cModule)
+  if (module == rb_singleton_class(rb_cModule))
     return module;
     
-  VALUE klass = class_alloc(T_ICLASS, rb_cClass);
+  VALUE klass = class_alloc(T_ICLASS, rb_singleton_class(rb_cModule));
 
-  if (BUILTIN_TYPE(module) == T_ICLASS) {
-    module = RBASIC(module)->klass;
-  }
+  /* if (BUILTIN_TYPE(module) == T_ICLASS) { */
+  /*   module = RBASIC(module)->klass; */
+  /* } */
   if (!RCLASS_IV_TBL(module)) {
     RCLASS_IV_TBL(module) = st_init_numtable();
   }
-  RCLASS_IV_TBL(klass) = RCLASS_IV_TBL(module);
+  RCLASS_IV_TBL(klass) = st_init_numtable();
   RCLASS_M_TBL(klass) = RCLASS_M_TBL(module);
   RCLASS_SUPER(klass) = super;
   /*
@@ -40,11 +43,12 @@ include_class_new(VALUE module, VALUE super)
   
   /* create IClass for module's singleton  */
   VALUE meta = include_class_new(KLASS_OF(module), KLASS_OF(super)); 
-  FL_SET(meta, FL_SINGLETON);
+  if (meta != rb_singleton_class(rb_cModule)) {
+    FL_SET(meta, FL_SINGLETON);
 
-  /* attach singleton to module */
-  rb_singleton_class_attached(meta, klass);
-
+    /* attach singleton to module */
+    rb_singleton_class_attached(meta, klass);
+  }
   /* assign the metaclass to module's klass */
   KLASS_OF(klass) = meta;
         
@@ -54,7 +58,7 @@ include_class_new(VALUE module, VALUE super)
   return (VALUE)klass;
 }
 
-void
+VALUE
 rb_real_include_module(VALUE klass, VALUE module)
 {
   VALUE p, c;
@@ -108,6 +112,8 @@ rb_real_include_module(VALUE klass, VALUE module)
     module = RCLASS_SUPER(module);
   }
   if (changed) rb_clear_cache();
+
+  return Qnil;
 }
 
 void
