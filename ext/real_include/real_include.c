@@ -42,7 +42,8 @@ include_class_new(VALUE module, VALUE super)
   */
   
   /* create IClass for module's singleton  */
-  VALUE meta = include_class_new(KLASS_OF(module), KLASS_OF(super)); 
+
+  VALUE meta = include_class_new(KLASS_OF(module), super ? KLASS_OF(super) : rb_cModule); 
   if (meta != rb_singleton_class(rb_cModule)) {
     FL_SET(meta, FL_SINGLETON);
 
@@ -78,6 +79,7 @@ rb_real_include_module(VALUE klass, VALUE module)
 
   /* ensure singleton class exists */
   rb_singleton_class(module);
+  rb_singleton_class(klass);
   
   while (module) {
     int superclass_seen = FALSE;
