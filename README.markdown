@@ -4,6 +4,8 @@ Real Include
 (c) John Mair (banisterfiend) 
 MIT license
 
+** Currently only Ruby 1.9 only **
+
 Removes the shackles from Module#include - use Module#real_include to
 bring in singleton classes from modules. No more ugly ClassMethods and
 included() hook hacks.
