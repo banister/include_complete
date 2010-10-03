@@ -1,3 +1,5 @@
+/* (c) 2010 John Mair (banisterfiend), MIT license */
+
 #include "compat.h"
 #include "ruby.h"
 
@@ -7,44 +9,42 @@
 static VALUE
 class_alloc(VALUE flags, VALUE klass)
 {
-    rb_classext_t *ext = ALLOC(rb_classext_t);
-    NEWOBJ(obj, struct RClass);
-    OBJSETUP(obj, klass, flags);
-    obj->ptr = ext;
-    RCLASS_IV_TBL(obj) = 0;
-    RCLASS_M_TBL(obj) = 0;
-    RCLASS_SUPER(obj) = 0;
-    RCLASS_IV_INDEX_TBL(obj) = 0;
-    return (VALUE)obj;
+  rb_classext_t *ext = ALLOC(rb_classext_t);
+  NEWOBJ(obj, struct RClass);
+  OBJSETUP(obj, klass, flags);
+  obj->ptr = ext;
+  RCLASS_IV_TBL(obj) = 0;
+  RCLASS_M_TBL(obj) = 0;
+  RCLASS_SUPER(obj) = 0;
+  RCLASS_IV_INDEX_TBL(obj) = 0;
+  return (VALUE)obj;
 }
 
 static VALUE
 include_class_new(VALUE module, VALUE super)
 {
+  /* base case for recursion */
   if (module == rb_singleton_class(rb_cModule))
     return module;
     
+  /* allocate iclass */
   VALUE klass = class_alloc(T_ICLASS, rb_singleton_class(rb_cModule));
 
-  /* if (BUILTIN_TYPE(module) == T_ICLASS) { */
-  /*   module = RBASIC(module)->klass; */
-  /* } */
-  if (!RCLASS_IV_TBL(module)) {
-    RCLASS_IV_TBL(module) = st_init_numtable();
-  }
+  /* we want a fresh ivtbl */
   RCLASS_IV_TBL(klass) = st_init_numtable();
+
+  /* we want to copy the mtbl */
   RCLASS_M_TBL(klass) = RCLASS_M_TBL(module);
   RCLASS_SUPER(klass) = super;
-  /*
-    if (TYPE(module) == T_ICLASS) {
-    RBASIC(klass)->klass = RBASIC(module)->klass;
-    }
-  */
-  
-  /* create IClass for module's singleton  */
 
-  VALUE meta = include_class_new(KLASS_OF(module), super ? KLASS_OF(super) : rb_cModule); 
+  /* create IClass for module's singleton  */
+  /* if super is 0 then we're including into a module (not a class), so treat as special case */
+  VALUE meta = include_class_new(KLASS_OF(module), super ? KLASS_OF(super) : rb_cModule);
+
+  /* don't mess with (Module) */
   if (meta != rb_singleton_class(rb_cModule)) {
+
+    /* set it as a singleton */
     FL_SET(meta, FL_SINGLETON);
 
     /* attach singleton to module */
@@ -77,7 +77,7 @@ rb_real_include_module(VALUE klass, VALUE module)
   OBJ_INFECT(klass, module);
   c = klass;
 
-  /* ensure singleton class exists */
+  /* ensure singleton classes exist, both for includer and includee */
   rb_singleton_class(module);
   rb_singleton_class(klass);
   
@@ -103,8 +103,13 @@ rb_real_include_module(VALUE klass, VALUE module)
       }
     }
 
+    /* we're including the module, so create the iclass */
     VALUE imod = include_class_new(module, RCLASS_SUPER(c));
+
+    /* module gets included directly above c, so set the super */
     RCLASS_SUPER(c) = imod;
+
+    /* also do the same for parallel inheritance chain (singleton classes) */
     RCLASS_SUPER(KLASS_OF(c)) = KLASS_OF(imod);
     c = imod;
         
