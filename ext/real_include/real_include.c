@@ -8,8 +8,6 @@
 #  define OBJ_UNTRUSTED OBJ_TAINTED
 #endif
 
-
-
 #define FALSE 0
 #define TRUE 1
 
