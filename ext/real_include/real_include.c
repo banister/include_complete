@@ -3,9 +3,17 @@
 #include "compat.h"
 #include "ruby.h"
 
+#ifndef RUBY_19
+#  include "st.h"
+#  define OBJ_UNTRUSTED OBJ_TAINTED
+#endif
+
+
+
 #define FALSE 0
 #define TRUE 1
 
+#ifdef RUBY_19
 static VALUE
 class_alloc(VALUE flags, VALUE klass)
 {
@@ -19,6 +27,7 @@ class_alloc(VALUE flags, VALUE klass)
   RCLASS_IV_INDEX_TBL(obj) = 0;
   return (VALUE)obj;
 }
+#endif
 
 static VALUE
 include_class_new(VALUE module, VALUE super)
@@ -28,8 +37,12 @@ include_class_new(VALUE module, VALUE super)
     return module;
     
   /* allocate iclass */
+#ifdef RUBY_19
   VALUE klass = class_alloc(T_ICLASS, rb_singleton_class(rb_cModule));
-
+#else
+  NEWOBJ(klass, struct RClass);
+  OBJSETUP(klass, rb_cClass, T_ICLASS);
+#endif
   /* we want a fresh ivtbl */
   RCLASS_IV_TBL(klass) = st_init_numtable();
 
@@ -48,7 +61,7 @@ include_class_new(VALUE module, VALUE super)
     FL_SET(meta, FL_SINGLETON);
 
     /* attach singleton to module */
-    rb_singleton_class_attached(meta, klass);
+    rb_singleton_class_attached((VALUE)meta, (VALUE)klass);
   }
   /* assign the metaclass to module's klass */
   KLASS_OF(klass) = meta;
