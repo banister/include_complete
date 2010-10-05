@@ -3,14 +3,6 @@
 #include "compat.h"
 #include "ruby.h"
 
-#ifndef RUBY_19
-#  include "st.h"
-#  define OBJ_UNTRUSTED OBJ_TAINTED
-#endif
-
-#define FALSE 0
-#define TRUE 1
-
 #ifdef RUBY_19
 static VALUE
 class_alloc(VALUE flags, VALUE klass)

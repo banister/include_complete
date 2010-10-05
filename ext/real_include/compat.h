@@ -10,6 +10,10 @@
 # define RCLASS_M_TBL(c) (RCLASS(c)->m_tbl)
 # define RCLASS_SUPER(c) (RCLASS(c)->super)
 # define RCLASS_IV_TBL(c) (RCLASS(c)->iv_tbl)
+# define OBJ_UNTRUSTED OBJ_TAINTED
+# define FALSE 0
+# define TRUE 1
+# include "st.h"
 #endif
 
 /* a useful macro. cannot use ordinary CLASS_OF as it does not return an lvalue */
