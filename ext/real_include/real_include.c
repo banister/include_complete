@@ -31,7 +31,7 @@ include_class_new(VALUE module, VALUE super)
   VALUE klass = class_alloc(T_ICLASS, rb_singleton_class(rb_cModule));
 #else
   NEWOBJ(klass, struct RClass);
-  OBJSETUP(klass, rb_cClass, T_ICLASS);
+  OBJSETUP(klass, rb_singleton_class(rb_cModule), T_ICLASS);
 #endif
   /* we want a fresh ivtbl */
   RCLASS_IV_TBL(klass) = st_init_numtable();

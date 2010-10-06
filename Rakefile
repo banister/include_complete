@@ -25,10 +25,10 @@ specification = Gem::Specification.new do |s|
   s.homepage = "http://banisterfiend.wordpress.com"
   s.has_rdoc = false
 
-#  s.extensions = ["ext/real_include/extconf.rb"]
+  #s.extensions = ["ext/real_include/extconf.rb"]
   s.files =  ["Rakefile", "README.markdown", "CHANGELOG", 
-              "lib/real_include.rb", "lib/real_include/version.rb", "lib/1.9/real_include.so",
-              "lib/1.8/real_include.so"] +
+              "lib/real_include.rb", "lib/real_include/version.rb"] +
+    ["lib/1.9/real_include.so", "lib/1.8/real_include.so"] +
   FileList["ext/**/extconf.rb", "ext/**/*.h", "ext/**/*.c"].to_a 
 end
 
