@@ -11,10 +11,11 @@
 # define RCLASS_SUPER(c) (RCLASS(c)->super)
 # define RCLASS_IV_TBL(c) (RCLASS(c)->iv_tbl)
 # define OBJ_UNTRUSTED OBJ_TAINTED
-# define FALSE 0
-# define TRUE 1
 # include "st.h"
 #endif
+
+# define FALSE 0
+# define TRUE 1
 
 /* a useful macro. cannot use ordinary CLASS_OF as it does not return an lvalue */
 #define KLASS_OF(c) (RBASIC(c)->klass)
