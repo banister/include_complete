@@ -19,6 +19,14 @@ class_alloc(VALUE flags, VALUE klass)
 }
 #endif
 
+
+static VALUE
+class_to_s(VALUE self)
+{
+  return rb_iv_get(self, "__class_name__");
+}
+
+
 static VALUE
 include_class_new(VALUE module, VALUE super)
 {
@@ -52,6 +60,12 @@ include_class_new(VALUE module, VALUE super)
 
     /* attach singleton to module */
     rb_singleton_class_attached((VALUE)meta, (VALUE)klass);
+
+    /* set the #to_s so that #ancestors isn't weird */
+    rb_iv_set(meta, "__class_name__", rb_mod_name(module));
+
+    /* attach the #to_s method to the metaclass */
+    rb_define_singleton_method(meta, "to_s", class_to_s, 0);
   }
   /* assign the metaclass to module's klass */
   KLASS_OF(klass) = meta;
