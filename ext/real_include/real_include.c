@@ -23,9 +23,13 @@ class_alloc(VALUE flags, VALUE klass)
 static VALUE
 class_to_s(VALUE self)
 {
-  return rb_iv_get(self, "__class_name__");
+  VALUE attached = rb_iv_get(self, "__attached__");
+  
+  if (attached) 
+    return rb_mod_name(rb_iv_get(attached, "__module__"));
+  else
+    return rb_mod_name(rb_iv_get(self, "__module__"));
 }
-
 
 static VALUE
 include_class_new(VALUE module, VALUE super)
@@ -33,6 +37,17 @@ include_class_new(VALUE module, VALUE super)
   /* base case for recursion */
   if (module == rb_singleton_class(rb_cModule))
     return module;
+
+  if (TYPE(module) == T_ICLASS) {
+
+    /* real_include */
+    if (rb_iv_get(module, "__module__"))
+      module = rb_iv_get(module, "__module__");
+
+    /* ordinary Module#include */
+    else
+      module = KLASS_OF(module);
+  }
     
   /* allocate iclass */
 #ifdef RUBY_19
@@ -48,6 +63,9 @@ include_class_new(VALUE module, VALUE super)
   RCLASS_M_TBL(klass) = RCLASS_M_TBL(module);
   RCLASS_SUPER(klass) = super;
 
+  if (TYPE(module) == T_MODULE ||  FL_TEST(module, FL_SINGLETON))
+    rb_iv_set(klass, "__module__", module);
+    
   /* create IClass for module's singleton  */
   /* if super is 0 then we're including into a module (not a class), so treat as special case */
   VALUE meta = include_class_new(KLASS_OF(module), super ? KLASS_OF(super) : rb_cModule);
@@ -59,12 +77,9 @@ include_class_new(VALUE module, VALUE super)
     FL_SET(meta, FL_SINGLETON);
 
     /* attach singleton to module */
-    rb_singleton_class_attached((VALUE)meta, (VALUE)klass);
+    rb_iv_set(meta, "__attached__", klass);
 
-    /* set the #to_s so that #ancestors isn't weird */
-    rb_iv_set(meta, "__class_name__", rb_mod_name(module));
-
-    /* attach the #to_s method to the metaclass */
+    /* attach the #to_s method to the metaclass (so #ancestors doesn't look weird) */
     rb_define_singleton_method(meta, "to_s", class_to_s, 0);
   }
   /* assign the metaclass to module's klass */
