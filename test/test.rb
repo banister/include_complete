@@ -51,7 +51,6 @@ describe 'Including a module into a module and then into a class using real_incl
         :instance_method2
       end
     }
-
     @m2.send(:real_include, @m1)
 
     @c = Class.new
@@ -73,5 +72,38 @@ describe 'Including a module into a module and then into a class using real_incl
 
     obj.instance_method1.should.equal :instance_method1
     obj.instance_method2.should.equal :instance_method2
+  end
+
+  it 'should make ancestor chain "look" accurate' do
+    @m1 = Module.new {
+      def self.class_method1
+        :class_method1
+      end
+
+      def instance_method1
+        :instance_method1
+      end
+    }
+
+    Object.const_set(:M1, @m1) 
+
+    @m2 = Module.new {
+      def self.class_method2
+        :class_method2
+      end
+
+      def instance_method2
+        :instance_method2
+      end
+    }
+    Object.const_set(:M2, @m2) 
+
+    @m2.send(:real_include, @m1)
+
+    @c = Class.new
+
+    @c.send(:real_include, @m2)
+    
+    @c.ancestors[1].to_s.should.equal M2.name
   end
 end
