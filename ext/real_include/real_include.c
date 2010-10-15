@@ -46,7 +46,8 @@ include_class_new(VALUE module, VALUE super)
 
     /* ordinary Module#include */
     else
-      module = KLASS_OF(module);
+      rb_raise(rb_eRuntimeError, "Sorry, real_include does not yet work with Module#include. Please do not mix and match.");
+    //      module = KLASS_OF(module);
   }
     
   /* allocate iclass */
