@@ -1,5 +1,10 @@
-#include <ruby.h>
+/* (c) 2010 John Mair (banisterfiend), MIT license */
+/* patches Module#include to work correctly with real_include */
 
+#include <ruby.h>
+#include "compat.h"
+
+#ifdef RUBY_19
 static VALUE
 class_alloc(VALUE flags, VALUE klass)
 {
@@ -13,20 +18,30 @@ class_alloc(VALUE flags, VALUE klass)
   RCLASS_IV_INDEX_TBL(obj) = 0;
   return (VALUE)obj;
 }
+#endif
 
 /* patched to work well with real_include */
 static VALUE
 include_class_new(VALUE module, VALUE super)
 {
+#ifdef RUBY_19
   VALUE klass = class_alloc(T_ICLASS, rb_cClass);
-
+#else
+  NEWOBJ(klass, struct RClass);
+  OBJSETUP(klass, rb_singleton_class(rb_cModule), T_ICLASS);
+#endif
+  
   if (BUILTIN_TYPE(module) == T_ICLASS) {
 
+    /***************************************************************************** */
+    /* This is the only change required, everything else is (pretty much) copypasta from class.c */
     /* correct for real_include'd modules */
     if (!NIL_P(rb_iv_get(module, "__module__")))
       module = rb_iv_get(module, "__module__");
     else
       module = RBASIC(module)->klass;
+    /***************************************************************************** */
+
   }
   if (!RCLASS_IV_TBL(module)) {
     RCLASS_IV_TBL(module) = st_init_numtable();
@@ -111,5 +126,5 @@ rb_patched_mod_append_features(VALUE module, VALUE include)
 
 void
 Init_patched_include() {
-  rb_define_method(rb_cModule, "include", rb_patched_mod_append_features, 1);
+  rb_define_method(rb_cModule, "append_features", rb_patched_mod_append_features, 1);
 }

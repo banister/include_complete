@@ -109,7 +109,7 @@ describe 'Including a module into a module and then into a class using real_incl
     @c.class_method2.should.equal :class_method2
   end
 
-  it 'should work with normal Module#include' do
+  it 'should work if real_including a module that has another module included using Module#include' do
     @m1 = Module.new {
       def self.class_method1
         :class_method1
@@ -144,5 +144,70 @@ describe 'Including a module into a module and then into a class using real_incl
     @c.class_method1.should.equal :class_method1
     @c.class_method2.should.equal :class_method2
   end
+
+  it 'should work if Module#including a module that has another module included using real_include' do
+    @m1 = Module.new {
+      def self.class_method1
+        :class_method1
+      end
+
+      def instance_method1
+        :instance_method1
+      end
+    }
+
+    Object.const_set(:K1, @m1) 
+
+    @m2 = Module.new {
+      def self.class_method2
+        :class_method2
+      end
+
+      def instance_method2
+        :instance_method2
+      end
+    }
+    Object.const_set(:K2, @m2) 
+
+    @m2.send(:real_include, @m1)
+
+    @c = Class.new
+
+    @c.send(:include, @m2)
+    
+    @c.ancestors[1].should.equal K2
+    @c.ancestors[2].should.equal K1
+    @c.new.instance_method1.should.equal :instance_method1
+    @c.new.instance_method2.should.equal :instance_method2
+  end
   
+
+  it 'should work with multiple modules passed to real_include' do
+    @m1 = Module.new {
+      def self.class_method1
+        :class_method1
+      end
+
+      def instance_method1
+        :instance_method1
+      end
+    }
+
+    @m2 = Module.new {
+      def self.class_method2
+        :class_method2
+      end
+
+      def instance_method2
+        :instance_method2
+      end
+    }
+
+    @c = Class.new
+    @c.send(:real_include, @m2, @m1)
+    
+    @c.class_method1.should.equal :class_method1
+    @c.class_method2.should.equal :class_method2
+  end
+    
 end

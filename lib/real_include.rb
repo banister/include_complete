@@ -1,3 +1,5 @@
+# (c) 2010 John Mair (banisterfiend), MIT license
+
 direc = File.dirname(__FILE__)
 
 begin
@@ -13,3 +15,28 @@ rescue LoadError => e
 end
 
 require "#{direc}/real_include/version"
+
+
+class Module
+
+  # include multiple modules (and their singletons) into an
+  # inheritance chain
+  # @param [Module] mods Modules to real_include
+  # @return Returns the receiver
+  # @example
+  #   module M
+  #     def self.hello
+  #       puts "hello"
+  #     end
+  #   end
+  #   class C
+  #     real_include M
+  #   end
+  #   C.hello #=> "hello"
+  def real_include(*mods)
+    mods.each do |mod|
+      real_include_one mod
+    end
+    self
+  end
+end
