@@ -64,7 +64,7 @@ include_class_new(VALUE module, VALUE super)
   RCLASS_SUPER(klass) = super;
 
   if (TYPE(module) == T_MODULE ||  FL_TEST(module, FL_SINGLETON))
-    rb_iv_set(klass, "__module__", module);
+    rb_iv_set((VALUE)klass, "__module__", module);
     
   /* create IClass for module's singleton  */
   /* if super is 0 then we're including into a module (not a class), so treat as special case */
@@ -77,7 +77,7 @@ include_class_new(VALUE module, VALUE super)
     FL_SET(meta, FL_SINGLETON);
 
     /* attach singleton to module */
-    rb_iv_set(meta, "__attached__", klass);
+    rb_iv_set(meta, "__attached__", (VALUE)klass);
 
     /* attach the #to_s method to the metaclass (so #ancestors doesn't look weird) */
     rb_define_singleton_method(meta, "to_s", class_to_s, 0);

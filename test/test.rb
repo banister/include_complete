@@ -105,5 +105,44 @@ describe 'Including a module into a module and then into a class using real_incl
     @c.send(:real_include, @m2)
     
     @c.ancestors[1].to_s.should.equal M2.name
+    @c.class_method1.should.equal :class_method1
+    @c.class_method2.should.equal :class_method2
   end
+
+  it 'should work with normal Module#include' do
+    @m1 = Module.new {
+      def self.class_method1
+        :class_method1
+      end
+
+      def instance_method1
+        :instance_method1
+      end
+    }
+
+    Object.const_set(:N1, @m1) 
+
+    @m2 = Module.new {
+      def self.class_method2
+        :class_method2
+      end
+
+      def instance_method2
+        :instance_method2
+      end
+    }
+    Object.const_set(:N2, @m2) 
+
+    @m2.send(:include, @m1)
+
+    @c = Class.new
+
+    @c.send(:real_include, @m2)
+    
+    @c.ancestors[1].to_s.should.equal N2.name
+    @c.ancestors[2].to_s.should.equal N1.name
+    @c.class_method1.should.equal :class_method1
+    @c.class_method2.should.equal :class_method2
+  end
+  
 end
