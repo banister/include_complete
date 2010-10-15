@@ -41,13 +41,12 @@ include_class_new(VALUE module, VALUE super)
   if (TYPE(module) == T_ICLASS) {
 
     /* real_include */
-    if (rb_iv_get(module, "__module__"))
+    if (!NIL_P(rb_iv_get(module, "__module__")))
       module = rb_iv_get(module, "__module__");
 
     /* ordinary Module#include */
     else
-      rb_raise(rb_eRuntimeError, "Sorry, real_include does not yet work with Module#include. Please do not mix and match.");
-    //      module = KLASS_OF(module);
+      module = KLASS_OF(module);
   }
     
   /* allocate iclass */
