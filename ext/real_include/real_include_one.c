@@ -1,4 +1,5 @@
 /* (c) 2010 John Mair (banisterfiend), MIT license */
+/* */
 /* include a module (and its singleton) into an inheritance chain */
 /* only includes a single module, see real_include.rb for multi-module version */
 
@@ -59,10 +60,15 @@ include_class_new(VALUE module, VALUE super)
   NEWOBJ(klass, struct RClass);
   OBJSETUP(klass, rb_singleton_class(rb_cModule), T_ICLASS);
 #endif
-  /* we want a fresh ivtbl */
-  RCLASS_IV_TBL(klass) = st_init_numtable();
 
-  /* we want to copy the mtbl */
+  /* if the module hasn't yet got an ivtbl, create it */
+  if (!RCLASS_IV_TBL(module))
+    RCLASS_IV_TBL(module) = st_init_numtable();
+
+  /* we want to point to the original ivtbl for normal modules, so that we bring in constants */
+  RCLASS_IV_TBL(klass) = RCLASS_IV_TBL(module);
+  
+  /* we want to point to the original module's mtbl */
   RCLASS_M_TBL(klass) = RCLASS_M_TBL(module);
   RCLASS_SUPER(klass) = super;
 
@@ -79,6 +85,9 @@ include_class_new(VALUE module, VALUE super)
     /* set it as a singleton */
     FL_SET(meta, FL_SINGLETON);
 
+    /* we want a fresh ivtbl for singleton classes (so we can redefine __attached__) */
+    RCLASS_IV_TBL(klass) = st_init_numtable();
+
     /* attach singleton to module */
     rb_iv_set(meta, "__attached__", (VALUE)klass);
 
@@ -87,7 +96,7 @@ include_class_new(VALUE module, VALUE super)
   }
   /* assign the metaclass to module's klass */
   KLASS_OF(klass) = meta;
-        
+
   OBJ_INFECT(klass, module);
   OBJ_INFECT(klass, super);
 

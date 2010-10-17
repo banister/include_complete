@@ -19,7 +19,7 @@ require "#{direc}/real_include/version"
 
 class Module
 
-  # include multiple modules (and their singletons) into an
+  # include modules (and their singletons) into an
   # inheritance chain
   # @param [Module] mods Modules to real_include
   # @return Returns the receiver
@@ -38,5 +38,26 @@ class Module
       real_include_one mod
     end
     self
+  end
+end
+
+class Object
+
+  # extend modules (and their singletons) into an
+  # inheritance chain
+  # @param [Module] mods Modules to real_extend
+  # @return Returns the receiver
+  # @example
+  #   module M
+  #     def self.hello
+  #       puts "hello"
+  #     end
+  #   end
+  #   o = Object.new
+  #   o.real_extend M
+  #   end
+  #   o.singleton_class.hello #=> "hello"
+  def real_extend(*mods)
+    class << self; self; end.send(:real_include, *mods)
   end
 end

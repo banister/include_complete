@@ -14,6 +14,8 @@ describe 'Including a module into a class using real_include' do
       end
     }
 
+    @m::CONST = :const
+
     @c = Class.new
 
     @c.send(:real_include, @m)
@@ -26,6 +28,10 @@ describe 'Including a module into a class using real_include' do
   it 'should make instance methods accessible to instances of the class' do
     obj = @c.new
     obj.instance_method.should.equal :instance_method
+  end
+
+  it 'should make constants accessible to the class' do
+    @c.const_defined?(:CONST).should.equal true
   end
 end
 
