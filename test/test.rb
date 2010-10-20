@@ -31,7 +31,7 @@ describe 'Including a module into a class using real_include' do
   end
 
   it 'should make constants accessible to the class' do
-    @c.const_defined?(:CONST).should.equal true
+    lambda { @c::CONST }.should.not.raise NameError
   end
 end
 
