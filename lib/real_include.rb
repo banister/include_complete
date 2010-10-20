@@ -55,7 +55,6 @@ class Object
   #   end
   #   o = Object.new
   #   o.real_extend M
-  #   end
   #   o.singleton_class.hello #=> "hello"
   def real_extend(*mods)
     class << self; self; end.send(:real_include, *mods)
