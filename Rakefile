@@ -21,7 +21,7 @@ specification = Gem::Specification.new do |s|
   s.description = s.summary
   s.require_path = 'lib'
   #s.platform = Gem::Platform::RUBY
-  s.platform = 'i386-mingw32'
+  s.platform = 'i386-mswin32'
   s.homepage = "http://banisterfiend.wordpress.com"
   s.has_rdoc = 'yard'
 

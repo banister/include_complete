@@ -48,6 +48,8 @@ describe 'Including a module into a module and then into a class using real_incl
       end
     }
 
+    @m1::CONST1 = :const1
+
     @m2 = Module.new {
       def self.class_method2
         :class_method2
@@ -59,6 +61,8 @@ describe 'Including a module into a module and then into a class using real_incl
     }
     @m2.send(:real_include, @m1)
 
+    @m2::CONST2 = :const2
+
     @c = Class.new
 
     @c.send(:real_include, @m2)
@@ -66,6 +70,12 @@ describe 'Including a module into a module and then into a class using real_incl
 
   it 'should make class methods on m1 accessible to m2' do
     @m2.class_method1.should.equal :class_method1
+  end
+
+  it 'should make constants on m1 and m2 accessible to class' do
+    lambda { @c::CONST1 == :const1 }.should.not.raise NameError
+    lambda { @m2::CONST1 == :const1 }.should.not.raise NameError
+    lambda { @c::CONST2 == :const2 }.should.not.raise NameError
   end
 
   it 'should make class methods on modules m1 and m2 accessible to class' do

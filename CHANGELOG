@@ -1,3 +1,5 @@
+20/10/2010 versio 0.2.1
+* constant lookup should now work
 15/10/2010 version 0.1.7
 * should be properly working with normal Module#include now
 * no more segfaults?
