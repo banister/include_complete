@@ -1,6 +1,11 @@
+direc = File.dirname(__FILE__)
+
 require 'rubygems'
-require '../lib/real_include'
+require "#{direc}/../lib/real_include"
 require 'bacon'
+
+puts "Testing RealInclude version #{RealInclude::VERSION}..."
+puts "Ruby version #{RUBY_VERSION}"
 
 describe 'Including a module into a class using real_include' do
   before do
@@ -32,6 +37,34 @@ describe 'Including a module into a class using real_include' do
 
   it 'should make constants accessible to the class' do
     lambda { @c::CONST }.should.not.raise NameError
+  end
+end
+
+describe 'Extending a module into a class using real_extend' do
+  before do
+    @m = Module.new {
+      def self.class_method
+        :class_method
+      end
+
+      def instance_method
+        :instance_method
+      end
+    }
+
+    @m::CONST = :const
+
+    @c = Class.new
+
+    @c.send(:real_extend, @m)
+  end
+
+  it 'should make instance methods from the module available as class methods on the class' do
+    @c.instance_method.should.equal :instance_method
+  end
+
+  it 'should make class methods from the module available as class methods on the singleton class' do
+    class << @c; self; end.class_method.should.equal :class_method
   end
 end
 

@@ -1,5 +1,9 @@
-20/10/2010 versio 0.2.1
+22/10/2010 version 0.2.2
+* refactored compat.h, incorporated test for 1.9
+* created inline static function create_class() in compat.h
+20/10/2010 version 0.2.1
 * constant lookup should now work
+* added real_extend and tests
 15/10/2010 version 0.1.7
 * should be properly working with normal Module#include now
 * no more segfaults?
