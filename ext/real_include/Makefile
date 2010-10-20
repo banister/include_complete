@@ -4,13 +4,11 @@ SHELL = /bin/sh
 #### Start of system configuration section. ####
 
 srcdir = .
-topdir = /C/ruby192/include/ruby-1.9.1
-hdrdir = /C/ruby192/include/ruby-1.9.1
-arch_hdrdir = C:/ruby192/include/ruby-1.9.1/$(arch)
+topdir = /home/john/.rvm/rubies/ruby-1.9.2-head/include/ruby-1.9.1
+hdrdir = /home/john/.rvm/rubies/ruby-1.9.2-head/include/ruby-1.9.1
+arch_hdrdir = /home/john/.rvm/rubies/ruby-1.9.2-head/include/ruby-1.9.1/$(arch)
 VPATH = $(srcdir):$(arch_hdrdir)/ruby:$(hdrdir)/ruby
-
-DESTDIR = C:
-prefix = $(DESTDIR)/ruby192
+prefix = $(DESTDIR)/home/john/.rvm/rubies/ruby-1.9.2-head
 rubylibprefix = $(libdir)/$(RUBY_BASE_NAME)
 exec_prefix = $(prefix)
 vendorhdrdir = $(rubyhdrdir)/vendor_ruby
@@ -47,44 +45,44 @@ vendorarchdir = $(vendorlibdir)/$(sitearch)
 
 CC = gcc
 CXX = g++
-LIBRUBY = lib$(RUBY_SO_NAME).dll.a
+LIBRUBY = $(LIBRUBY_SO)
 LIBRUBY_A = lib$(RUBY_SO_NAME)-static.a
-LIBRUBYARG_SHARED = -l$(RUBY_SO_NAME)
-LIBRUBYARG_STATIC = -l$(RUBY_SO_NAME)-static
+LIBRUBYARG_SHARED = -Wl,-R -Wl,$(libdir) -L$(libdir) -l$(RUBY_SO_NAME)
+LIBRUBYARG_STATIC = -Wl,-R -Wl,$(libdir) -L$(libdir) -l$(RUBY_SO_NAME)-static
 OUTFLAG = -o 
 COUTFLAG = -o 
 
 RUBY_EXTCONF_H = 
 cflags   =  $(optflags) $(debugflags) $(warnflags)
-optflags = -O3
-debugflags = -g
+optflags = -O0
+debugflags = -ggdb
 warnflags = -Wextra -Wno-unused-parameter -Wno-parentheses -Wpointer-arith -Wwrite-strings -Wno-missing-field-initializers -Wno-long-long
-CFLAGS   =  $(cflags) -DRUBY_19 -std=c99 
+CFLAGS   = -fPIC $(cflags)  -fPIC -DRUBY_19 -std=c99 
 INCFLAGS = -I. -I$(arch_hdrdir) -I$(hdrdir)/ruby/backward -I$(hdrdir) -I$(srcdir)
-DEFS     = 
+DEFS     = -D_FILE_OFFSET_BITS=64
 CPPFLAGS =   $(DEFS) $(cppflags)
 CXXFLAGS = $(CFLAGS) $(cxxflags)
-ldflags  = -L. 
-dldflags =  -Wl,--enable-auto-image-base,--enable-auto-import $(DEFFILE)
+ldflags  = -L.  -rdynamic -Wl,-export-dynamic
+dldflags = 
 ARCH_FLAG = 
 DLDFLAGS = $(ldflags) $(dldflags)
-LDSHARED = $(CC) -shared $(if $(filter-out -g -g0,$(debugflags)),,-s)
-LDSHAREDXX = $(CXX) -shared $(if $(filter-out -g -g0,$(debugflags)),,-s)
+LDSHARED = $(CC) -shared
+LDSHAREDXX = $(CXX) -shared
 AR = ar
-EXEEXT = .exe
+EXEEXT = 
 
 RUBY_BASE_NAME = ruby
 RUBY_INSTALL_NAME = ruby
-RUBY_SO_NAME = msvcrt-ruby191
-arch = i386-mingw32
-sitearch = i386-msvcrt
+RUBY_SO_NAME = ruby
+arch = i686-linux
+sitearch = $(arch)
 ruby_version = 1.9.1
-ruby = C:/ruby192/bin/ruby
+ruby = /home/john/.rvm/rubies/ruby-1.9.2-head/bin/ruby
 RUBY = $(ruby)
 RM = rm -f
 RM_RF = $(RUBY) -run -e rm -- -rf
 RMDIRS = $(RUBY) -run -e rmdir -- -p
-MAKEDIRS = /usr/bin/mkdir -p
+MAKEDIRS = /bin/mkdir -p
 INSTALL = /usr/bin/install -c
 INSTALL_PROG = $(INSTALL) -m 0755
 INSTALL_DATA = $(INSTALL) -m 644
@@ -95,10 +93,10 @@ COPY = cp
 preload = 
 
 libpath = . $(libdir)
-LIBPATH =  -L. -L$(libdir)
-DEFFILE = $(TARGET)-$(arch).def
+LIBPATH =  -L. -L$(libdir) -Wl,-R$(libdir)
+DEFFILE = 
 
-CLEANFILES = mkmf.log $(DEFFILE)
+CLEANFILES = mkmf.log
 DISTCLEANFILES = 
 DISTCLEANDIRS = 
 
@@ -106,9 +104,9 @@ extout =
 extout_prefix = 
 target_prefix = 
 LOCAL_LIBS = 
-LIBS = $(LIBRUBYARG_SHARED)  -lshell32 -lws2_32  
-SRCS = patched_include.c real_include.c real_include_one.c
-OBJS = patched_include.o real_include.o real_include_one.o
+LIBS = $(LIBRUBYARG_SHARED)  -lpthread -lrt -ldl -lcrypt -lm   -lc
+SRCS = real_include_one.c real_include.c patched_include.c
+OBJS = real_include_one.o real_include.o patched_include.o
 TARGET = real_include
 DLLIB = $(TARGET).so
 EXTSTATIC = 
@@ -163,7 +161,7 @@ site-install: site-install-so site-install-rb
 site-install-so: install-so
 site-install-rb: install-rb
 
-.SUFFIXES: .c .m .cc .cxx .cpp .o
+.SUFFIXES: .c .m .cc .cxx .cpp .C .o
 
 .cc.o:
 	$(CXX) $(INCFLAGS) $(CPPFLAGS) $(CXXFLAGS) $(COUTFLAG)$@ -c $<
@@ -174,16 +172,16 @@ site-install-rb: install-rb
 .cpp.o:
 	$(CXX) $(INCFLAGS) $(CPPFLAGS) $(CXXFLAGS) $(COUTFLAG)$@ -c $<
 
+.C.o:
+	$(CXX) $(INCFLAGS) $(CPPFLAGS) $(CXXFLAGS) $(COUTFLAG)$@ -c $<
+
 .c.o:
 	$(CC) $(INCFLAGS) $(CPPFLAGS) $(CFLAGS) $(COUTFLAG)$@ -c $<
 
-$(DLLIB): $(DEFFILE) $(OBJS) Makefile
+$(DLLIB): $(OBJS) Makefile
 	@-$(RM) $(@)
 	$(LDSHARED) -o $@ $(OBJS) $(LIBPATH) $(DLDFLAGS) $(LOCAL_LIBS) $(LIBS)
 
 
-
-$(DEFFILE): 
-	$(RUBY) -e "puts 'EXPORTS', 'Init_$(TARGET)'"  > $@
 
 $(OBJS): $(hdrdir)/ruby.h $(hdrdir)/ruby/defines.h $(arch_hdrdir)/ruby/config.h

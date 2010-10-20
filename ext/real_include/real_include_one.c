@@ -86,7 +86,7 @@ include_class_new(VALUE module, VALUE super)
     FL_SET(meta, FL_SINGLETON);
 
     /* we want a fresh ivtbl for singleton classes (so we can redefine __attached__) */
-    RCLASS_IV_TBL(klass) = st_init_numtable();
+    RCLASS_IV_TBL(meta) = st_init_numtable();
 
     /* attach singleton to module */
     rb_iv_set(meta, "__attached__", (VALUE)klass);
