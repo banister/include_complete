@@ -4,32 +4,11 @@
 #include <ruby.h>
 #include "compat.h"
 
-#ifdef RUBY_19
-static VALUE
-class_alloc(VALUE flags, VALUE klass)
-{
-  rb_classext_t *ext = ALLOC(rb_classext_t);
-  NEWOBJ(obj, struct RClass);
-  OBJSETUP(obj, klass, flags);
-  obj->ptr = ext;
-  RCLASS_IV_TBL(obj) = 0;
-  RCLASS_M_TBL(obj) = 0;
-  RCLASS_SUPER(obj) = 0;
-  RCLASS_IV_INDEX_TBL(obj) = 0;
-  return (VALUE)obj;
-}
-#endif
-
 /* patched to work well with real_include */
 static VALUE
 include_class_new(VALUE module, VALUE super)
 {
-#ifdef RUBY_19
-  VALUE klass = class_alloc(T_ICLASS, rb_cClass);
-#else
-  NEWOBJ(klass, struct RClass);
-  OBJSETUP(klass, rb_singleton_class(rb_cModule), T_ICLASS);
-#endif
+  VALUE klass = create_class(T_ICLASS, rb_cClass);
   
   if (BUILTIN_TYPE(module) == T_ICLASS) {
 

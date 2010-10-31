@@ -1,6 +1,11 @@
+direc = File.dirname(__FILE__)
+
 require 'rubygems'
-require '../lib/real_include'
+require "#{direc}/../lib/real_include"
 require 'bacon'
+
+puts "Testing RealInclude version #{RealInclude::VERSION}..."
+puts "Ruby version #{RUBY_VERSION}"
 
 describe 'Including a module into a class using real_include' do
   before do
