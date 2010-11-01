@@ -149,3 +149,7 @@ Problems or questions contact me at [github](http://github.com/banister)
 
 * Note: This project was previously called `real_include`
 
+Dedication
+----------
+
+For Dahrkael 
