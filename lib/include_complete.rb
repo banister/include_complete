@@ -4,24 +4,24 @@ direc = File.dirname(__FILE__)
 
 begin
   if RUBY_VERSION && RUBY_VERSION =~ /1.9/
-    require "#{direc}/1.9/real_include"
+    require "#{direc}/1.9/include_complete"
   else
-    require "#{direc}/1.8/real_include"
+    require "#{direc}/1.8/include_complete"
   end
 rescue LoadError => e
   require 'rbconfig'
   dlext = Config::CONFIG['DLEXT']
-  require "#{direc}/real_include.#{dlext}"
+  require "#{direc}/include_complete.#{dlext}"
 end
 
-require "#{direc}/real_include/version"
+require "#{direc}/include_complete/version"
 
 
 class Module
 
   # include modules (and their singletons) into an
   # inheritance chain
-  # @param [Module] mods Modules to real_include
+  # @param [Module] mods Modules to include_complete
   # @return Returns the receiver
   # @example
   #   module M
@@ -30,12 +30,12 @@ class Module
   #     end
   #   end
   #   class C
-  #     real_include M
+  #     include_complete M
   #   end
   #   C.hello #=> "hello"
-  def real_include(*mods)
+  def include_complete(*mods)
     mods.each do |mod|
-      real_include_one mod
+      include_complete_one mod
     end
     self
   end
@@ -45,7 +45,7 @@ class Object
 
   # extend modules (and their singletons) into an
   # inheritance chain
-  # @param [Module] mods Modules to real_extend
+  # @param [Module] mods Modules to extend_complete
   # @return Returns the receiver
   # @example
   #   module M
@@ -54,9 +54,9 @@ class Object
   #     end
   #   end
   #   o = Object.new
-  #   o.real_extend M
+  #   o.extend_complete M
   #   o.singleton_class.hello #=> "hello"
-  def real_extend(*mods)
-    class << self; self; end.send(:real_include, *mods)
+  def extend_complete(*mods)
+    class << self; self; end.send(:include_complete, *mods)
   end
 end

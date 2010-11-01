@@ -1,3 +1,5 @@
+1/11/2010 *NAME CHANGE* TO include_complete, version reset to 0.1.0
+* now called include_complete
 22/10/2010 version 0.2.2
 * refactored compat.h, incorporated test for 1.9
 * created inline static function create_class() in compat.h
