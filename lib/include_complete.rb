@@ -25,6 +25,10 @@ class Module
   # @return Returns the receiver
   # @example
   #   module M
+  #     def bye
+  #       puts "bye"
+  #     end
+  #     
   #     def self.hello
   #       puts "hello"
   #     end
@@ -32,6 +36,7 @@ class Module
   #   class C
   #     include_complete M
   #   end
+  #   C.new.bye #=> "bye"
   #   C.hello #=> "hello"
   def include_complete(*mods)
     mods.reverse.each do |mod|
@@ -49,12 +54,17 @@ class Object
   # @return Returns the receiver
   # @example
   #   module M
+  #     def bye
+  #       puts "bye"
+  #     end
+  #     
   #     def self.hello
   #       puts "hello"
   #     end
   #   end
   #   o = Object.new
   #   o.extend_complete M
+  #   o.bye #=> "bye"
   #   o.singleton_class.hello #=> "hello"
   def extend_complete(*mods)
     class << self; self; end.send(:include_complete, *mods)
