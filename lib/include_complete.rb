@@ -58,5 +58,6 @@ class Object
   #   o.singleton_class.hello #=> "hello"
   def extend_complete(*mods)
     class << self; self; end.send(:include_complete, *mods)
+    self
   end
 end

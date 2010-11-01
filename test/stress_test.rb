@@ -1,14 +1,15 @@
-require '../lib/real_include'
+direc = File.dirname(__FILE__)
+require "#{direc}/../lib/include_complete"
 
 5000.times {
   m = Module.new
   n = Module.new
   k = Module.new
-  n.real_include m
-  k.real_include n
+  n.include_complete m
+  k.include_complete n
 
   c = Class.new
-  c.real_include k
+  c.include_complete k
 }
 
 "stress test passed!".display
