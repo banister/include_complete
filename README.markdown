@@ -1,5 +1,5 @@
-Real Include 
---------------
+Include Complete
+----------------
 
 (c) John Mair (banisterfiend) 
 MIT license
@@ -12,7 +12,7 @@ included() hook hacks.
    at own risk **
 
 install the gem: **for testing purposes only**
-`gem install real_include`
+`gem install include_complete`
 
 example: 
 
@@ -29,7 +29,7 @@ example:
     end
 
     class A
-        real_include M
+        include_complete M
     end
 
     # invoke class method

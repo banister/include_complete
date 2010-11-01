@@ -5,15 +5,15 @@ dlext = Config::CONFIG['DLEXT']
 
 require 'rake/clean'
 require 'rake/gempackagetask'
-require './lib/real_include/version'
+require './lib/include_complete/version'
 
 CLEAN.include("ext/**/*.#{dlext}", "ext/**/*.log", "ext/**/*.o", "ext/**/*~", "ext/**/*#*", "ext/**/*.obj", "ext/**/*.def", "ext/**/*.pdb")
 CLOBBER.include("**/*.#{dlext}", "**/*~", "**/*#*", "**/*.log", "**/*.o")
 
 def apply_spec_defaults(s)
-  s.name = "real_include"
+  s.name = "include_complete"
   s.summary = "Fixing the limitations in traditional Module#include"
-  s.version = RealInclude::VERSION
+  s.version = IncludeComplete::VERSION
   s.date = Time.now.strftime '%Y-%m-%d'
   s.author = "John Mair (banisterfiend)"
   s.email = 'jrmair@gmail.com'
@@ -49,7 +49,7 @@ namespace :ruby do
   spec = Gem::Specification.new do |s|
     apply_spec_defaults(s)        
     s.platform = Gem::Platform::RUBY
-    s.extensions = ["ext/real_include/extconf.rb"]
+    s.extensions = ["ext/include_complete/extconf.rb"]
   end
 
   Rake::GemPackageTask.new(spec) do |pkg|

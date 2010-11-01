@@ -1,7 +1,7 @@
 /* (c) 2010 John Mair (banisterfiend), MIT license */
 /* */
 /* include a module (and its singleton) into an inheritance chain */
-/* only includes a single module, see real_include.rb for multi-module version */
+/* only includes a single module, see include_complete.rb for multi-module version */
 
 #include <ruby.h>
 #include "compat.h"
@@ -27,7 +27,7 @@ include_class_new(VALUE module, VALUE super)
 
   if (TYPE(module) == T_ICLASS) {
 
-    /* real_include */
+    /* include_complete */
     if (!NIL_P(rb_iv_get(module, "__module__")))
       module = rb_iv_get(module, "__module__");
 
@@ -82,7 +82,7 @@ include_class_new(VALUE module, VALUE super)
 }
 
 static VALUE
-rb_real_include_module_one(VALUE klass, VALUE module)
+rb_include_complete_module_one(VALUE klass, VALUE module)
 {
   VALUE p, c;
   int changed = 0;
@@ -146,6 +146,6 @@ rb_real_include_module_one(VALUE klass, VALUE module)
 }
 
 void
-Init_real_include_one() {
-  rb_define_method(rb_cModule, "real_include_one", rb_real_include_module_one, 1);
+Init_include_complete_one() {
+  rb_define_method(rb_cModule, "include_complete_one", rb_include_complete_module_one, 1);
 }

@@ -1,13 +1,13 @@
 direc = File.dirname(__FILE__)
 
 require 'rubygems'
-require "#{direc}/../lib/real_include"
+require "#{direc}/../lib/include_complete"
 require 'bacon'
 
-puts "Testing RealInclude version #{RealInclude::VERSION}..."
+puts "Testing IncludeComplete version #{IncludeComplete::VERSION}..."
 puts "Ruby version #{RUBY_VERSION}"
 
-describe 'Including a module into a class using real_include' do
+describe 'Including a module into a class using include_complete' do
   before do
     @m = Module.new {
       def self.class_method
@@ -23,7 +23,7 @@ describe 'Including a module into a class using real_include' do
 
     @c = Class.new
 
-    @c.send(:real_include, @m)
+    @c.send(:include_complete, @m)
   end
 
   it 'should make class methods accessible to class' do
@@ -40,7 +40,7 @@ describe 'Including a module into a class using real_include' do
   end
 end
 
-describe 'Extending a module into a class using real_extend' do
+describe 'Extending a module into a class using extend_complete' do
   before do
     @m = Module.new {
       def self.class_method
@@ -56,7 +56,7 @@ describe 'Extending a module into a class using real_extend' do
 
     @c = Class.new
 
-    @c.send(:real_extend, @m)
+    @c.send(:extend_complete, @m)
   end
 
   it 'should make instance methods from the module available as class methods on the class' do
@@ -69,7 +69,7 @@ describe 'Extending a module into a class using real_extend' do
 end
 
     
-describe 'Including a module into a module and then into a class using real_include' do
+describe 'Including a module into a module and then into a class using include_complete' do
     before do
     @m1 = Module.new {
       def self.class_method1
@@ -92,13 +92,13 @@ describe 'Including a module into a module and then into a class using real_incl
         :instance_method2
       end
     }
-    @m2.send(:real_include, @m1)
+    @m2.send(:include_complete, @m1)
 
     @m2::CONST2 = :const2
 
     @c = Class.new
 
-    @c.send(:real_include, @m2)
+    @c.send(:include_complete, @m2)
   end
 
   it 'should make class methods on m1 accessible to m2' do
@@ -147,11 +147,11 @@ describe 'Including a module into a module and then into a class using real_incl
     }
     Object.const_set(:M2, @m2) 
 
-    @m2.send(:real_include, @m1)
+    @m2.send(:include_complete, @m1)
 
     @c = Class.new
 
-    @c.send(:real_include, @m2)
+    @c.send(:include_complete, @m2)
     
     @c.ancestors[1].to_s.should.equal M2.name
     @c.class_method1.should.equal :class_method1
@@ -186,7 +186,7 @@ describe 'Including a module into a module and then into a class using real_incl
 
     @c = Class.new
 
-    @c.send(:real_include, @m2)
+    @c.send(:include_complete, @m2)
     
     @c.ancestors[1].to_s.should.equal N2.name
     @c.ancestors[2].to_s.should.equal N1.name
@@ -194,7 +194,7 @@ describe 'Including a module into a module and then into a class using real_incl
     @c.class_method2.should.equal :class_method2
   end
 
-  it 'should work if Module#including a module that has another module included using real_include' do
+  it 'should work if Module#including a module that has another module included using include_complete' do
     @m1 = Module.new {
       def self.class_method1
         :class_method1
@@ -218,7 +218,7 @@ describe 'Including a module into a module and then into a class using real_incl
     }
     Object.const_set(:K2, @m2) 
 
-    @m2.send(:real_include, @m1)
+    @m2.send(:include_complete, @m1)
 
     @c = Class.new
 
@@ -231,7 +231,7 @@ describe 'Including a module into a module and then into a class using real_incl
   end
   
 
-  it 'should work with multiple modules passed to real_include' do
+  it 'should work with multiple modules passed to include_complete' do
     @m1 = Module.new {
       def self.class_method1
         :class_method1
@@ -253,7 +253,7 @@ describe 'Including a module into a module and then into a class using real_incl
     }
 
     @c = Class.new
-    @c.send(:real_include, @m2, @m1)
+    @c.send(:include_complete, @m2, @m1)
     
     @c.class_method1.should.equal :class_method1
     @c.class_method2.should.equal :class_method2
