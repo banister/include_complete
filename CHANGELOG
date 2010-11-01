@@ -1,3 +1,5 @@
+1/11/2010 version 0.1.2
+* Anonymous module's #to_s now returns "Anon"
 1/11/2010 *NAME CHANGE* TO include_complete, version reset to 0.1.0
 * now called include_complete
 22/10/2010 version 0.2.2

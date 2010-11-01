@@ -1,3 +1,4 @@
+/* include_complete_one.c */
 /* (c) 2010 John Mair (banisterfiend), MIT license */
 /* */
 /* include a module (and its singleton) into an inheritance chain */
@@ -10,11 +11,18 @@ static VALUE
 class_to_s(VALUE self)
 {
   VALUE attached = rb_iv_get(self, "__attached__");
+  VALUE name;
   
   if (attached) 
-    return rb_mod_name(rb_iv_get(attached, "__module__"));
+    name = rb_mod_name(rb_iv_get(attached, "__module__"));
   else
-    return rb_mod_name(rb_iv_get(self, "__module__"));
+    name = rb_mod_name(rb_iv_get(self, "__module__"));
+
+  /* if module does not have a name, return "Anon" */
+  if (NIL_P(name) || RSTRING_LEN(name) == 0)
+    return rb_str_new2("Anon");
+  else
+    return name;
 }
 
 /* totally hacked up version of include_class_new() from class.c; brings in singletons into inheritance chain */
@@ -51,7 +59,7 @@ include_class_new(VALUE module, VALUE super)
   RCLASS_SUPER(klass) = super;
 
   if (TYPE(module) == T_MODULE ||  FL_TEST(module, FL_SINGLETON))
-    rb_iv_set((VALUE)klass, "__module__", module);
+    rb_iv_set(klass, "__module__", module);
     
   /* create IClass for module's singleton  */
   /* if super is 0 then we're including into a module (not a class), so treat as special case */
@@ -149,3 +157,4 @@ void
 Init_include_complete_one() {
   rb_define_method(rb_cModule, "include_complete_one", rb_include_complete_module_one, 1);
 }
+

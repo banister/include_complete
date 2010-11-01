@@ -34,7 +34,7 @@ class Module
   #   end
   #   C.hello #=> "hello"
   def include_complete(*mods)
-    mods.each do |mod|
+    mods.reverse.each do |mod|
       include_complete_one mod
     end
     self
