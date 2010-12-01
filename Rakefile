@@ -7,8 +7,10 @@ require 'rake/clean'
 require 'rake/gempackagetask'
 require './lib/include_complete/version'
 
-CLEAN.include("ext/**/*.#{dlext}", "ext/**/*.log", "ext/**/*.o", "ext/**/*~", "ext/**/*#*", "ext/**/*.obj", "ext/**/*.def", "ext/**/*.pdb")
 CLOBBER.include("**/*.#{dlext}", "**/*~", "**/*#*", "**/*.log", "**/*.o")
+CLEAN.include("ext/**/*.#{dlext}", "ext/**/*.log", "ext/**/*.o", "ext/**/*~",
+              "ext/**/*#*", "ext/**/*.obj", "ext/**/*.def",
+              "ext/**/*.pdb", "*flymake", "*flymake.*")
 
 def apply_spec_defaults(s)
   s.name = "include_complete"
@@ -21,9 +23,9 @@ def apply_spec_defaults(s)
   s.require_path = 'lib'
   s.homepage = "http://banisterfiend.wordpress.com"
   s.has_rdoc = 'yard'
-  s.files =  FileList["Rakefile", "README.markdown", "CHANGELOG", 
+  s.files =  Dir["Rakefile", "README.markdown", "CHANGELOG", 
                       "lib/**/*.rb", "ext/**/extconf.rb", "ext/**/*.h",
-                      "ext/**/*.c", "test/**/*.rb"].to_a 
+                      "ext/**/*.c", "test/**/*.rb"]
 end
 
 task :test do
@@ -35,7 +37,7 @@ end
     spec = Gem::Specification.new do |s|
       apply_spec_defaults(s)        
       s.platform = "i386-#{v}"
-      s.files += FileList["lib/**/*.#{dlext}"].to_a
+      s.files += Dir["lib/**/*.#{dlext}"]
     end
 
     Rake::GemPackageTask.new(spec) do |pkg|
@@ -55,5 +57,42 @@ namespace :ruby do
   Rake::GemPackageTask.new(spec) do |pkg|
     pkg.need_zip = false
     pkg.need_tar = false
+  end
+end
+
+directories = ["#{direc}/lib/1.8", "#{direc}/lib/1.9"]
+directories.each { |d| directory d }
+
+desc "build the 1.8 and 1.9 binaries from source and copy to lib/"
+task :compile => directories do
+  build_for = proc do |pik_ver, ver|
+    sh %{ \
+          c:\\devkit\\devkitvars.bat && \
+          pik #{pik_ver} && \
+          ruby extconf.rb && \
+          make clean && \
+          make && \
+          cp *.so #{direc}/lib/#{ver} \
+        }
+  end
+  
+  chdir("#{direc}/ext/include_complete") do
+    build_for.call("187", "1.8")
+    build_for.call("192", "1.9")
+  end
+end
+
+desc "build all platform gems at once"
+task :gems => [:clean, :rmgems, "mingw32:gem", "mswin32:gem", "ruby:gem"]
+
+desc "remove all platform gems"
+task :rmgems => ["ruby:clobber_package"]
+
+desc "build and push latest gems"
+task :pushgems => :gems do
+  chdir("#{direc}/pkg") do
+    Dir["*.gem"].each do |gemfile|
+      sh "gem push #{gemfile}"
+    end
   end
 end
