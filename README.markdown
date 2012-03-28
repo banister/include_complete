@@ -19,28 +19,29 @@ example: include_complete():
 Using `include_complete` the class methods of the
 module will be mixed in along with the instance methods:
 
-    
-    module M
-        # class method
-        def self.hello
-            puts "hello!"
-        end
+```ruby    
+module M
+  # class method
+  def self.hello
+    puts "hello!"
+  end
 
-        # instance method
-        def bye
-            puts "bye!"
-        end
-    end
+  # instance method
+  def bye
+    puts "bye!"
+  end
+end
 
-    class A
-        include_complete M
-    end
+class A
+  include_complete M
+end
 
-    # invoke class method
-    A.hello #=> hello!
+# invoke class method
+A.hello #=> hello!
 
-    # invoke instance method
-    A.new.bye #=> bye!
+# invoke instance method
+A.new.bye #=> bye!
+```
 
 Motivation
 -----------
