@@ -68,19 +68,21 @@ methods into the singleton class of the receiver. But where do the
 singleton methods on the module end up? On the singleton class of the
 singleton class of the receiver ;)
 
-    module M
-      def self.hello
-        :hello
-      end
-    end
-    
-    class C
-      extend_complete M
-    
-      class << self
-        hello #=> :hello
-      end
-    end
+```ruby
+module M
+  def self.hello
+    :hello
+  end
+end
+
+class C
+  extend_complete M
+
+  class << self
+    hello #=> :hello
+  end
+end
+```
         
 As a result of this, it is unlikely `extend_complete` will be of much
 use to anyone :)
